@@ -23,7 +23,7 @@ export default function RootLayout({
 }
 
 export const metadata: Metadata = {
-  title: "Admin Panel",
+  title: "Annotation",
   description: "Admin panel for managing books, annotations, and fatwas",
 }
 
