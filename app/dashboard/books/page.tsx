@@ -90,7 +90,7 @@ export default function BooksPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Thumbnail</TableHead>
+              <TableHead>Book cover</TableHead>
               <TableHead>Title</TableHead>
               <TableHead>Author</TableHead>
               <TableHead>Type</TableHead>

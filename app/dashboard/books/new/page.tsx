@@ -12,18 +12,18 @@ const bookFormSchema = z.object({
   title: z.string().min(2, {
     message: "Title must be at least 2 characters.",
   }),
-  author: z.string().min(2, {
-    message: "Author must be at least 2 characters.",
+  author: z.string({
+    required_error: "Please select an author.",
   }),
   editor: z.string().optional(),
-  publisher: z.string().min(2, {
-    message: "Publisher must be at least 2 characters.",
+  publisher: z.string({
+    required_error: "Please select a publisher.",
   }),
   type: z.string({
     required_error: "Please select a book type.",
   }),
   category: z.string({
-    required_error: "Please select a book type.",
+    required_error: "Please select a book category.",
   }),
   file: z.any().refine((file) => file?.length === 1, "Book file is required."),
   thumbnail: z.any().refine((file) => file?.length === 1, "Thumbnail is required."),
@@ -68,9 +68,18 @@ export default function NewBookPage() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Author</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter author name" {...field} />
-                </FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select an author" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="author1">Author 1</SelectItem>
+                    <SelectItem value="author2">Author 2</SelectItem>
+                    <SelectItem value="author3">Author 3</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -81,9 +90,18 @@ export default function NewBookPage() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Editor</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter editor name" {...field} />
-                </FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select an editor" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="editor1">Editor 1</SelectItem>
+                    <SelectItem value="editor2">Editor 2</SelectItem>
+                    <SelectItem value="editor3">Editor 3</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -94,9 +112,18 @@ export default function NewBookPage() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Publisher</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter publisher name" {...field} />
-                </FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a publisher" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="publisher1">Publisher 1</SelectItem>
+                    <SelectItem value="publisher2">Publisher 2</SelectItem>
+                    <SelectItem value="publisher3">Publisher 3</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -125,14 +152,14 @@ export default function NewBookPage() {
           />
           <FormField
             control={form.control}
-            name="type"
+            name="category"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Book Category</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a book Category" />
+                      <SelectValue placeholder="Select a book category" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
