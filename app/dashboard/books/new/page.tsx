@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
@@ -22,8 +22,11 @@ const bookFormSchema = z.object({
   type: z.string({
     required_error: "Please select a book type.",
   }),
-  dependency: z.string().optional(),
-  file: z.any().refine((file) => file?.length === 1, "File is required."),
+  category: z.string({
+    required_error: "Please select a book type.",
+  }),
+  file: z.any().refine((file) => file?.length === 1, "Book file is required."),
+  thumbnail: z.any().refine((file) => file?.length === 1, "Thumbnail is required."),
 })
 
 export default function NewBookPage() {
@@ -122,14 +125,22 @@ export default function NewBookPage() {
           />
           <FormField
             control={form.control}
-            name="dependency"
+            name="type"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Book Dependency</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter dependent book title" {...field} />
-                </FormControl>
-                <FormDescription>Enter the title of a book that this book depends on or references.</FormDescription>
+                <FormLabel>Book Category</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a book Category" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="legal">Legal</SelectItem>
+                    <SelectItem value="scholarly">Scholarly</SelectItem>
+                    <SelectItem value="religious">Religious</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -143,7 +154,19 @@ export default function NewBookPage() {
                 <FormControl>
                   <Input type="file" accept=".pdf,.docx" {...field} />
                 </FormControl>
-                <FormDescription>Upload the book file in PDF or DOCX format.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="thumbnail"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Upload Thumbnail</FormLabel>
+                <FormControl>
+                  <Input type="file" accept=".jpg,.png,.jpeg" {...field} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -154,4 +177,3 @@ export default function NewBookPage() {
     </div>
   )
 }
-

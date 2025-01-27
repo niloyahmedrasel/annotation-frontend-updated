@@ -5,10 +5,12 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Edit, Trash, PlayCircle } from "lucide-react" // Importing icons
 
 const books = [
   {
     id: "1",
+    thumbnail: "https://via.placeholder.com/50?text=Book+1",
     title: "The Book of Knowledge",
     author: "Scholar Name",
     type: "Religious",
@@ -17,6 +19,7 @@ const books = [
   },
   {
     id: "2",
+    thumbnail: "https://via.placeholder.com/50?text=Book+2",
     title: "Principles of Islamic Jurisprudence",
     author: "Dr. Ahmad Ali",
     type: "Legal",
@@ -25,6 +28,7 @@ const books = [
   },
   {
     id: "3",
+    thumbnail: "https://via.placeholder.com/50?text=Book+3",
     title: "Hadith Compilation",
     author: "Imam Bukhari",
     type: "Scholarly",
@@ -86,6 +90,7 @@ export default function BooksPage() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Thumbnail</TableHead>
               <TableHead>Title</TableHead>
               <TableHead>Author</TableHead>
               <TableHead>Type</TableHead>
@@ -97,6 +102,9 @@ export default function BooksPage() {
           <TableBody>
             {books.map((book) => (
               <TableRow key={book.id}>
+                <TableCell>
+                  <img src={book.thumbnail} alt={`${book.title} Thumbnail`} className="w-12 h-12 rounded-md" />
+                </TableCell>
                 <TableCell className="font-medium">{book.title}</TableCell>
                 <TableCell>{book.author}</TableCell>
                 <TableCell>{book.type}</TableCell>
@@ -110,15 +118,19 @@ export default function BooksPage() {
                     </Badge>
                   ))}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-right flex space-x-2">
                   <Button variant="ghost" size="sm" asChild>
-                    <Link href={`/dashboard/books/${book.id}`}>Edit</Link>
+                    <Link href={`/dashboard/books/${book.id}`}>
+                      <Edit className="w-4 h-4" />
+                    </Link>
                   </Button>
                   <Button variant="ghost" size="sm" asChild>
-                    <Link href={`/dashboard/books/process/${book.id}`}>Process</Link>
+                    <Link href={`/dashboard/books/process/${book.id}`}>
+                      <PlayCircle className="w-4 h-4" />
+                    </Link>
                   </Button>
                   <Button variant="ghost" size="sm">
-                    Delete
+                    <Trash className="w-4 h-4" />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -129,4 +141,3 @@ export default function BooksPage() {
     </div>
   )
 }
-

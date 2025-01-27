@@ -34,9 +34,6 @@ export function ReviewSection({ onBack }: { onBack: () => void }) {
             onChange={handleContentChange}
             placeholder="Edit the book content here..."
           />
-          <div className="mt-4 flex justify-end">
-            <Button>Save Changes</Button>
-          </div>
         </div>
       </div>
     </div>

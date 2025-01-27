@@ -36,6 +36,7 @@ export default function UsersPage() {
                 <Badge variant="secondary">{user.role}</Badge>
               </TableCell>
               <TableCell className="text-right">
+                <Button variant="ghost" size="sm">Freeze</Button>
                 <Button variant="ghost" size="sm" asChild>
                   <Link href={`/dashboard/roles/users/${user.id}`}>Edit</Link>
                 </Button>

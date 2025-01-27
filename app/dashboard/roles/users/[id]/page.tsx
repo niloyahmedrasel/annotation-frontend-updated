@@ -15,6 +15,9 @@ const userFormSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address.",
   }),
+  password: z.string().min(6, {
+    message: "Password must be at least 6 characters.",
+  }),
   role: z.string({
     required_error: "Please select a role.",
   }),
@@ -28,6 +31,7 @@ export default function UserForm({ params }: { params: { id: string } }) {
     defaultValues: {
       name: "",
       email: "",
+      password: "",
       role: "",
     },
   })
@@ -69,6 +73,19 @@ export default function UserForm({ params }: { params: { id: string } }) {
           />
           <FormField
             control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input type="password" placeholder="Enter a secure password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name="role"
             render={({ field }) => (
               <FormItem>
@@ -95,4 +112,3 @@ export default function UserForm({ params }: { params: { id: string } }) {
     </div>
   )
 }
-
