@@ -3,7 +3,20 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { ChevronDown, LayoutDashboard, Users, BookOpen, FileText, Tag, User, FolderTree, LogOut } from "lucide-react"
+import {
+  ChevronDown,
+  LayoutDashboard,
+  Users,
+  BookOpen,
+  FileText,
+  Tag,
+  User,
+  FolderTree,
+  LogOut,
+  Menu,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
@@ -47,7 +60,7 @@ const navItems: NavItem[] = [
       { title: "All Books", href: "/dashboard/books" },
       { title: "Add New Book", href: "/dashboard/books/new" },
       { title: "Categories", href: "/dashboard/books/categories" },
-      { title: "Process Books", href: "/dashboard/books/process" },
+      { title: "New Type", href: "/dashboard/books/new-type" },
     ],
   },
   {
@@ -98,28 +111,16 @@ const navItems: NavItem[] = [
   },
 ]
 
-export function Sidebar() {
+interface SidebarProps {
+  onCollapse: (collapsed: boolean) => void
+}
+
+export function Sidebar({ onCollapse }: SidebarProps) {
   const pathname = usePathname()
   const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({})
   const { user, logout } = useAuth()
   const router = useRouter()
-
-  useEffect(() => {
-    const currentOpenSubmenus: Record<string, boolean> = {}
-    navItems.forEach((item) => {
-      if (item.submenu && isActive(item)) {
-        currentOpenSubmenus[item.title] = true
-      }
-    })
-    setOpenSubmenus(currentOpenSubmenus)
-  }, [pathname])
-
-  const toggleSubmenu = (title: string) => {
-    setOpenSubmenus((prev) => ({
-      ...prev,
-      [title]: !prev[title],
-    }))
-  }
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
   const isActive = (item: NavItem) => {
     if (item.href === "/dashboard") {
@@ -131,6 +132,23 @@ export function Sidebar() {
     return pathname.startsWith(item.href)
   }
 
+  useEffect(() => {
+    const currentOpenSubmenus: Record<string, boolean> = {}
+    navItems.forEach((item) => {
+      if (item.submenu && isActive(item)) {
+        currentOpenSubmenus[item.title] = true
+      }
+    })
+    setOpenSubmenus(currentOpenSubmenus)
+  }, [pathname]) // Changed dependency to pathname
+
+  const toggleSubmenu = (title: string) => {
+    setOpenSubmenus((prev) => ({
+      ...prev,
+      [title]: !prev[title],
+    }))
+  }
+
   const handleLogout = () => {
     logout()
     router.push("/login")
@@ -138,13 +156,33 @@ export function Sidebar() {
 
   const filteredNavItems = navItems.filter((item) => item.roles.includes(user?.role || ""))
 
+  useEffect(() => {
+    onCollapse(isCollapsed)
+  }, [isCollapsed, onCollapse])
+
   return (
-    <div className="fixed inset-y-0 z-50 flex w-64 flex-col bg-gray-950 border-r border-gray-800">
+    <div
+      className={cn(
+        "fixed inset-y-0 z-50 flex flex-col bg-gray-950 border-r border-gray-800 transition-all duration-300 ease-in-out",
+        isCollapsed ? "w-16" : "w-64",
+      )}
+    >
       <div className="flex h-14 items-center border-b border-gray-800 px-4">
-        <Link href="/dashboard" className="flex items-center space-x-2">
-          <LayoutDashboard className="h-6 w-6 text-primary" />
-          <span className="font-bold text-lg text-white">Annotation</span>
-        </Link>
+        {isCollapsed ? (
+          <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(false)} className="ml-auto">
+            <ChevronRight className="h-6 w-6 text-primary" />
+          </Button>
+        ) : (
+          <>
+            <Link href="/dashboard" className="flex items-center space-x-2">
+              <LayoutDashboard className="h-6 w-6 text-primary" />
+              <span className="font-bold text-lg text-white">Annotation</span>
+            </Link>
+            <Button variant="ghost" size="icon" className="ml-auto" onClick={() => setIsCollapsed(true)}>
+              <ChevronLeft className="h-6 w-6 text-primary" />
+            </Button>
+          </>
+        )}
       </div>
       <ScrollArea className="flex-1">
         <nav className="space-y-1 px-1 py-2">
@@ -162,19 +200,23 @@ export function Sidebar() {
                 {item.submenu ? (
                   <div className="flex w-full items-center py-2">
                     <item.icon className="mr-2 h-4 w-4" />
-                    <span className="flex-1 text-left">{item.title}</span>
-                    <ChevronDown
-                      className={cn("h-4 w-4 transition-transform", openSubmenus[item.title] && "rotate-180")}
-                    />
+                    {!isCollapsed && (
+                      <>
+                        <span className="flex-1 text-left">{item.title}</span>
+                        <ChevronDown
+                          className={cn("h-4 w-4 transition-transform", openSubmenus[item.title] && "rotate-180")}
+                        />
+                      </>
+                    )}
                   </div>
                 ) : (
                   <Link href={item.href} className="flex w-full items-center py-2">
                     <item.icon className="mr-2 h-4 w-4" />
-                    <span className="flex-1 text-left">{item.title}</span>
+                    {!isCollapsed && <span className="flex-1 text-left">{item.title}</span>}
                   </Link>
                 )}
               </Button>
-              {item.submenu && openSubmenus[item.title] && (
+              {!isCollapsed && item.submenu && openSubmenus[item.title] && (
                 <div className="mt-1 space-y-1 px-4">
                   {item.submenu.map((subitem) => (
                     <Link
@@ -194,10 +236,13 @@ export function Sidebar() {
           ))}
         </nav>
       </ScrollArea>
-      <div className="p-4">
-        <Button variant="outline" className="w-full" onClick={handleLogout}>
-          <LogOut className="mr-2 h-4 w-4" />
-          Logout
+      <div className="p-4 flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <User className="h-6 w-6 text-gray-400" />
+          {!isCollapsed && <span className="text-sm font-medium text-gray-300">{user?.email}</span>}
+        </div>
+        <Button variant="ghost" size="icon" onClick={handleLogout} title="Logout">
+          <LogOut className="h-4 w-4 text-gray-400" />
         </Button>
       </div>
     </div>

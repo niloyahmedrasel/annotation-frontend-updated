@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 const annotations = [
   {
@@ -89,7 +90,7 @@ export default function AnnotationsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Text</TableHead>
+              <TableHead>Annotation Title</TableHead>
               <TableHead>Book</TableHead>
               <TableHead>Chapter</TableHead>
               <TableHead>Tags</TableHead>
@@ -111,7 +112,24 @@ export default function AnnotationsPage() {
                     </Badge>
                   ))}
                 </TableCell>
-                <TableCell>{annotation.createdBy}</TableCell>
+                <TableCell>
+                  <div className="flex items-center space-x-2">
+                    <Avatar className="w-6 h-6">
+                      <AvatarImage
+                        src={`https://api.dicebear.com/6.x/initials/svg?seed=${annotation.createdBy}`}
+                        alt={annotation.createdBy}
+                      />
+                      <AvatarFallback>
+                        {annotation.createdBy
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span>{annotation.createdBy}</span>
+                  </div>
+                </TableCell>
                 <TableCell>{annotation.createdAt}</TableCell>
                 <TableCell className="text-right">
                   <Button variant="ghost" size="sm" asChild>

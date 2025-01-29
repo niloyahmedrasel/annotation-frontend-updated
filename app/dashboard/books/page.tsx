@@ -1,3 +1,6 @@
+"use client"
+
+import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -5,9 +8,28 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Edit, Trash, PlayCircle } from "lucide-react" // Importing icons
+import { Edit, Trash, PlayCircle } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
-const books = [
+interface Book {
+  id: string
+  thumbnail: string
+  title: string
+  author: string
+  type: string
+  status: string
+  categories: string[]
+}
+
+const initialBooks: Book[] = [
   {
     id: "1",
     thumbnail: "https://via.placeholder.com/50?text=Book+1",
@@ -32,12 +54,33 @@ const books = [
     title: "Hadith Compilation",
     author: "Imam Bukhari",
     type: "Scholarly",
-    status: "Published",
+    status: "Unpublish",
     categories: ["Hadith", "Islamic Studies"],
   },
 ]
 
 export default function BooksPage() {
+  const [books, setBooks] = useState<Book[]>(initialBooks)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [bookToDelete, setBookToDelete] = useState<Book | null>(null)
+
+  const openDeleteDialog = (book: Book) => {
+    setBookToDelete(book)
+    setIsDeleteDialogOpen(true)
+  }
+
+  const closeDeleteDialog = () => {
+    setIsDeleteDialogOpen(false)
+    setBookToDelete(null)
+  }
+
+  const confirmDelete = () => {
+    if (bookToDelete) {
+      setBooks(books.filter((book) => book.id !== bookToDelete.id))
+      closeDeleteDialog()
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -82,6 +125,7 @@ export default function BooksPage() {
               <SelectItem value="published">Published</SelectItem>
               <SelectItem value="in-review">In Review</SelectItem>
               <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="Unpublish">Unpublish</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -90,20 +134,24 @@ export default function BooksPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Book cover</TableHead>
-              <TableHead>Title</TableHead>
+              <TableHead>Book Cover</TableHead>
+              <TableHead>Book Name</TableHead>
               <TableHead>Author</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Categories</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {books.map((book) => (
               <TableRow key={book.id}>
                 <TableCell>
-                  <img src={book.thumbnail} alt={`${book.title} Thumbnail`} className="w-12 h-12 rounded-md" />
+                  <img
+                    src={book.thumbnail || "/placeholder.svg"}
+                    alt={`${book.title} Thumbnail`}
+                    className="w-12 h-12 rounded-md"
+                  />
                 </TableCell>
                 <TableCell className="font-medium">{book.title}</TableCell>
                 <TableCell>{book.author}</TableCell>
@@ -118,26 +166,75 @@ export default function BooksPage() {
                     </Badge>
                   ))}
                 </TableCell>
-                <TableCell className="text-right flex space-x-2">
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link href={`/dashboard/books/${book.id}`}>
-                      <Edit className="w-4 h-4" />
-                    </Link>
-                  </Button>
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link href={`/dashboard/books/process/${book.id}`}>
-                      <PlayCircle className="w-4 h-4" />
-                    </Link>
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Trash className="w-4 h-4" />
-                  </Button>
+                <TableCell className="text-right">
+                  <div className="flex space-x-2 justify-end">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="sm" asChild>
+                            <Link href={`/dashboard/books/${book.id}`}>
+                              <Edit className="w-4 h-4" />
+                            </Link>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Edit</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="sm" asChild>
+                            <Link href={`/dashboard/books/process/${book.id}`}>
+                              <PlayCircle className="w-4 h-4" />
+                            </Link>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Process</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="sm" onClick={() => openDeleteDialog(book)}>
+                            <Trash className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Delete</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete the book "{bookToDelete?.title}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={closeDeleteDialog}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
+
