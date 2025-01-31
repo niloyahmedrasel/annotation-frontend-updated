@@ -32,7 +32,7 @@ interface Book {
 const initialBooks: Book[] = [
   {
     id: "1",
-    thumbnail: "https://via.placeholder.com/50?text=Book+1",
+    thumbnail: "/placeholder.svg",
     title: "The Book of Knowledge",
     author: "Scholar Name",
     type: "Religious",
@@ -41,7 +41,7 @@ const initialBooks: Book[] = [
   },
   {
     id: "2",
-    thumbnail: "https://via.placeholder.com/50?text=Book+2",
+    thumbnail: "/placeholder.svg",
     title: "Principles of Islamic Jurisprudence",
     author: "Dr. Ahmad Ali",
     type: "Legal",
@@ -50,7 +50,7 @@ const initialBooks: Book[] = [
   },
   {
     id: "3",
-    thumbnail: "https://via.placeholder.com/50?text=Book+3",
+    thumbnail: "/placeholder.svg",
     title: "Hadith Compilation",
     author: "Imam Bukhari",
     type: "Scholarly",
@@ -151,6 +151,9 @@ export default function BooksPage() {
                     src={book.thumbnail || "/placeholder.svg"}
                     alt={`${book.title} Thumbnail`}
                     className="w-12 h-12 rounded-md"
+                    onError={(e) => {
+                      e.currentTarget.src = "/placeholder.svg"
+                    }}
                   />
                 </TableCell>
                 <TableCell className="font-medium">{book.title}</TableCell>
