@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft } from "lucide-react"
 
-export function ReviewSection({ onBack }: { onBack: () => void }) {
+export function ReviewSection({ onBack, bookId }: { onBack: () => void; bookId: string }) {
   const [content, setContent] = useState("")
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -16,7 +16,7 @@ export function ReviewSection({ onBack }: { onBack: () => void }) {
           <ChevronLeft className="mr-2 h-4 w-4" />
           Back to Processing Steps
         </Button>
-        <h2 className="text-xl font-bold">Review & Complete</h2>
+        <h2 className="text-xl font-bold">Review & Complete: Book {bookId}</h2>
       </div>
       <div className="flex-1 flex overflow-hidden">
         {/* PDF Viewer Placeholder */}
